@@ -19,28 +19,32 @@ final class BalloonView: UIView {
             guard let balloonAsset, let image = UIImage(named: balloonAsset) else { return }
             let balloon = UIImageView(image: image)
             balloon.frame.size = CGSize(width: frame.width, height: frame.width * image.ratio)
-            animal?.center.x = balloon.center.x
+            animalView?.center.x = balloon.center.x
             addSubview(balloon)
             sendSubviewToBack(balloon)
             self.balloon = balloon
         }
     }
 
-    private var animal: UIImageView?
-    var animalAsset: String? {
+    private var animalView: UIImageView?
+    var animal: Animal? {
         didSet {
-            animal?.removeFromSuperview()
-            guard let animalAsset, let image = UIImage(named: animalAsset) else { return }
-            let animal = UIImageView(image: image)
-            animal.frame.size = CGSize(width: frame.width, height: frame.width * image.ratio)
-            animal.center.y = -animal.frame.height * 0.5
-            addSubview(animal)
-            self.animal = animal
+            animalView?.removeFromSuperview()
+            guard let animal, let image = UIImage(named: animal.imageName) else { return }
+            let animalView = UIImageView(image: image)
+            animalView.frame.size = CGSize(width: frame.width, height: frame.width * image.ratio)
+            animalView.center.y = -animalView.frame.height * 0.5
+            addSubview(animalView)
+            self.animalView = animalView
+            isAccessibilityElement = true
+            accessibilityTraits = .button
+            accessibilityLabel = "\(animal.rawValue.capitalized) balloon"
         }
     }
 
     func pop(_ completion: @escaping () -> Void = {}) {
         popped = true
+        accessibilityElementsHidden = true
         guard let balloon, let popImage = UIImage(named: Assets.Images.Balloons.Pop) else {
             completion()
             return
@@ -52,7 +56,7 @@ final class BalloonView: UIView {
             balloon.transform = CGAffineTransform(scaleX: 0.1, y: 0.1)
             balloon.center.y -= balloon.bounds.height / 4
             balloon.alpha = 0
-            self.animal?.alpha = 1
+            self.animalView?.alpha = 1
             pop.transform = CGAffineTransform(scaleX: 2, y: 2)
             pop.alpha = 0
         } completion: { _ in

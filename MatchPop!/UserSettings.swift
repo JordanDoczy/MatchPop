@@ -18,11 +18,28 @@ final class UserSettings {
 
     enum Difficulty: Int {
         case easy = 0, medium, hard
+
+        var cardCount: Int {
+            switch self {
+            case .easy: 12
+            case .medium: 30
+            case .hard: Animal.allCases.count * 2
+            }
+        }
+
+        var balloonCount: Int {
+            switch self {
+            case .easy: 6
+            case .medium: 11
+            case .hard: Animal.allCases.count
+            }
+        }
     }
 
-    private let defaults = UserDefaults.standard
+    private let defaults: UserDefaults
 
-    private init() {
+    init(defaults: UserDefaults = .standard) {
+        self.defaults = defaults
         defaults.register(defaults: [
             Keys.sound: true,
             Keys.difficulty: Difficulty.medium.rawValue

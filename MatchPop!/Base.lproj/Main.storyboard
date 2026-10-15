@@ -95,7 +95,7 @@
                                     <color key="titleColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 </state>
                                 <connections>
-                                    <segue destination="hkI-e7-8ZY" kind="presentation" identifier="Play Again" modalPresentationStyle="overFullScreen" modalTransitionStyle="crossDissolve" id="L5h-RY-ern"/>
+                                    <action selector="playAgainTapped:" destination="jZG-LV-L2k" eventType="touchUpInside" id="pA1-bT-n01"/>
                                 </connections>
                             </button>
                         </subviews>
@@ -106,8 +106,12 @@
                             <constraint firstAttribute="trailingMargin" secondItem="GlR-Nz-ZRQ" secondAttribute="trailing" id="rJK-uw-VPW"/>
                         </constraints>
                     </view>
+                    <connections>
+                        <segue destination="eX1-t0-Int" kind="unwind" identifier="Play Again" unwindAction="unwindToIntro:" id="L5h-RY-ern"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="YHn-T6-zPT" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <exit id="eX1-t0-Int" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
             <point key="canvasLocation" x="-490" y="976"/>
         </scene>
@@ -137,7 +141,7 @@
                                     <color key="titleColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 </state>
                                 <connections>
-                                    <segue destination="06o-W5-2Vk" kind="presentation" identifier="New Game" modalPresentationStyle="overFullScreen" modalTransitionStyle="crossDissolve" id="MfD-rw-bwa"/>
+                                    <segue destination="06o-W5-2Vk" kind="presentation" identifier="Show Settings" modalPresentationStyle="overFullScreen" modalTransitionStyle="crossDissolve" id="MfD-rw-bwa"/>
                                 </connections>
                             </button>
                             <button opaque="NO" alpha="0.94999998807907104" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hAd-Ug-8Pk">

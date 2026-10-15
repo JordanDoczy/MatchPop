@@ -21,11 +21,12 @@ final class CardView: UIView {
 
     // MARK: Public Members
     weak var delegate: CardViewDelegate?
-    private(set) var value: String?
+    private(set) var animal: Animal!
     var visible: Bool {
         get { subviews.contains(front) }
         set {
             isUserInteractionEnabled = !newValue
+            accessibilityLabel = newValue ? animal.rawValue.capitalized : "Card, face down"
             if newValue {
                 flip(from: back, to: front, options: .transitionFlipFromLeft, duration: 0.4)
             } else {
@@ -35,21 +36,26 @@ final class CardView: UIView {
     }
 
     // MARK: Init
-    convenience init(frame: CGRect, back backImage: String, front frontImage: String, color: UIColor = .clear) {
+    convenience init(frame: CGRect, animal: Animal) {
         self.init(frame: frame)
 
-        value = frontImage
-        back = createCard(backImage, color: UIColor(red: 206/255, green: 240/255, blue: 253/255, alpha: 1))
-        front = createCard(frontImage, color: color)
+        self.animal = animal
+        back = createCard(Assets.Images.Card, color: UIColor(red: 206/255, green: 240/255, blue: 253/255, alpha: 1))
+        front = createCard(animal.imageName, color: animal.cardColor)
         empty = UIView(frame: bounds)
         addSubview(empty)
 
         addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(tapped)))
         isUserInteractionEnabled = true
+
+        isAccessibilityElement = true
+        accessibilityTraits = .button
+        accessibilityLabel = "Card, face down"
     }
 
     // MARK: API
     func hide() {
+        accessibilityElementsHidden = true
         UIView.animate(withDuration: 0.55) {
             self.transform = CGAffineTransform(scaleX: 1.5, y: 1.5)
         } completion: { _ in
@@ -62,6 +68,11 @@ final class CardView: UIView {
 
     func show() {
         flip(from: empty, to: back, options: .transitionFlipFromLeft, duration: 0.35)
+    }
+
+    override func accessibilityActivate() -> Bool {
+        tapped()
+        return true
     }
 
     @objc private func tapped() {
@@ -81,6 +92,8 @@ final class CardView: UIView {
     }
 
     private func flip(from sideA: UIView, to sideB: UIView, options: UIView.AnimationOptions, duration: TimeInterval) {
+        // Reduce Motion swaps the flip for a fade.
+        let options = UIAccessibility.isReduceMotionEnabled ? .transitionCrossDissolve : options
         UIView.transition(from: sideA, to: sideB, duration: duration, options: options)
     }
 }

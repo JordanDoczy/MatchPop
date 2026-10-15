@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import AVFoundation
 
 final class IntroViewController: UIViewController {
 
@@ -19,7 +18,6 @@ final class IntroViewController: UIViewController {
     private var foreground: UIImageView!
     private var clouds = [UIImageView]()
     private var loaded = false
-    private var sounds = [AVAudioPlayer]()
 
     // MARK: IBOutlets
     @IBOutlet weak var settingsButton: UIButton!
@@ -59,10 +57,7 @@ final class IntroViewController: UIViewController {
     }
 
     private func play(_ sound: String) {
-        sounds.removeAll { !$0.isPlaying }
-        if let player = AVAudioPlayer.playSound(sound) {
-            sounds.append(player)
-        }
+        SoundPlayer.shared.play(sound)
     }
 
     private func removeClouds() {
@@ -71,6 +66,8 @@ final class IntroViewController: UIViewController {
     }
 
     // MARK: Handlers
+    @IBAction func unwindToIntro(_ segue: UIStoryboardSegue) {}
+
     @objc private func pandaTapped(_ sender: UITapGestureRecognizer) {
         play(Assets.Sounds.Giggle)
     }
@@ -90,6 +87,7 @@ final class IntroViewController: UIViewController {
 
     private func animateClouds() {
         removeClouds()
+        guard !UIAccessibility.isReduceMotionEnabled else { return }
         animateCloud(width: 120, y: 1, fromX: view.bounds.width, toX: -120 - 50, duration: 20)
         animateCloud(width: 60, y: 1, yPadding: 80, fromX: -60, toX: view.bounds.width + 50, duration: 15)
     }
@@ -139,7 +137,7 @@ final class IntroViewController: UIViewController {
     }
 
     private func animatePanda() {
-        let imageView = UIImageView(image: UIImage(named: Assets.Images.Animals.Panda))
+        let imageView = UIImageView(image: UIImage(named: Animal.panda.imageName))
         let imageWidth: CGFloat = 50
         let aspect = imageView.image.map { $0.size.height / $0.size.width } ?? 0
         let imageHeight = imageWidth * aspect
@@ -148,6 +146,9 @@ final class IntroViewController: UIViewController {
         view.addSubview(imageView)
 
         imageView.isUserInteractionEnabled = true
+        imageView.isAccessibilityElement = true
+        imageView.accessibilityTraits = .button
+        imageView.accessibilityLabel = "Panda"
         imageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(pandaTapped(_:))))
 
         UIView.animate(withDuration: 0.5, delay: 0.25, usingSpringWithDamping: 0.95, initialSpringVelocity: 20, options: .curveLinear) {

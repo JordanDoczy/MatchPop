@@ -7,19 +7,17 @@
 //
 
 import UIKit
-import AVFoundation
 
 final class SettingsViewController: UIViewController {
 
     // MARK: Members
-    private var audioPlayer: AVAudioPlayer?
     @IBOutlet weak var audioSwitch: UISwitch!
     @IBOutlet weak var difficultySelector: UISegmentedControl!
 
     // MARK: IBActions
     @IBAction func audioToggle(_ sender: UISwitch) {
-        audioPlayer = AVAudioPlayer.playSound(Assets.Sounds.Click)
         UserSettings.shared.sound = audioSwitch.isOn
+        SoundPlayer.shared.play(Assets.Sounds.Click)
     }
 
     @IBAction func close(_ sender: AnyObject) {
@@ -30,7 +28,7 @@ final class SettingsViewController: UIViewController {
     }
 
     @IBAction func difficultySelection(_ sender: UISegmentedControl) {
-        audioPlayer = AVAudioPlayer.playSound(Assets.Sounds.Click)
+        SoundPlayer.shared.play(Assets.Sounds.Click)
         if let difficulty = UserSettings.Difficulty(rawValue: difficultySelector.selectedSegmentIndex) {
             UserSettings.shared.difficulty = difficulty
         }

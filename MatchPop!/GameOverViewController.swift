@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import AVFoundation
 
 final class GameOverViewController: UIViewController, UICollisionBehaviorDelegate {
 
@@ -27,48 +26,9 @@ final class GameOverViewController: UIViewController, UICollisionBehaviorDelegat
         Assets.Images.Balloons.Blue,
         Assets.Images.Balloons.Purple
     ]
-    private let images = [
-        Assets.Images.Animals.Cat,
-        Assets.Images.Animals.Cow,
-        Assets.Images.Animals.Deer,
-        Assets.Images.Animals.Dog,
-        Assets.Images.Animals.Donkey,
-        Assets.Images.Animals.Elephant,
-        Assets.Images.Animals.Fox,
-        Assets.Images.Animals.Hen,
-        Assets.Images.Animals.Leopard,
-        Assets.Images.Animals.Lion,
-        Assets.Images.Animals.Monkey,
-        Assets.Images.Animals.Orangutan,
-        Assets.Images.Animals.Owl,
-        Assets.Images.Animals.Panda,
-        Assets.Images.Animals.Panther,
-        Assets.Images.Animals.Penguin,
-        Assets.Images.Animals.Pig,
-        Assets.Images.Animals.Rabbit,
-        Assets.Images.Animals.Rooster,
-        Assets.Images.Animals.Sheep,
-        Assets.Images.Animals.Zebra
-    ]
-    private let animalSounds = [
-        Assets.Images.Animals.Cat: Assets.Sounds.Cat,
-        Assets.Images.Animals.Cow: Assets.Sounds.Cow,
-        Assets.Images.Animals.Hen: Assets.Sounds.Chicken,
-        Assets.Images.Animals.Dog: Assets.Sounds.Dog,
-        Assets.Images.Animals.Donkey: Assets.Sounds.Donkey,
-        Assets.Images.Animals.Rooster: Assets.Sounds.Rooster,
-        Assets.Images.Animals.Sheep: Assets.Sounds.Sheep
-    ]
     private var imageWidth: CGFloat { view.bounds.width / 10 }
-    private var numberOfImages: Int {
-        switch UserSettings.shared.difficulty {
-        case .easy: 6
-        case .medium: 11
-        case .hard: images.count
-        }
-    }
+    private var numberOfAnimals: Int { UserSettings.shared.difficulty.balloonCount }
     private var pops = 0
-    private var sounds = [AVAudioPlayer]()
 
     // MARK: View Controller Lifecycle
     override func viewDidLoad() {
@@ -77,7 +37,14 @@ final class GameOverViewController: UIViewController, UICollisionBehaviorDelegat
         animator = UIDynamicAnimator(referenceView: view)
         animator.addBehavior(animalBehavior)
         animalBehavior.collisionDelegate = self
-        animalBehavior.boundary = CGRect(x: -50, y: -100, width: view.bounds.width + 100, height: view.bounds.height + 300)
+    }
+
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        // The view only has its final size here, not in viewDidLoad.
+        if animalBehavior.boundary == nil {
+            animalBehavior.boundary = CGRect(x: -50, y: -100, width: view.bounds.width + 100, height: view.bounds.height + 300)
+        }
     }
 
     override func viewDidAppear(_ animated: Bool) {
@@ -88,30 +55,30 @@ final class GameOverViewController: UIViewController, UICollisionBehaviorDelegat
 
     // MARK: UICollisionBehaviorDelegate
     func collisionBehavior(_ behavior: UICollisionBehavior, beganContactFor item: UIDynamicItem, withBoundaryIdentifier identifier: NSCopying?, at p: CGPoint) {
-        guard let animal = item as? BalloonView, let asset = animal.animalAsset else { return }
-        animalBehavior.removeView(animal)
+        guard let balloon = item as? BalloonView, let animal = balloon.animal else { return }
+        animalBehavior.removeView(balloon)
         // Unpopped balloons that drift off screen come back from the bottom.
-        if !animal.popped {
-            createAnimal(asset)
+        if !balloon.popped {
+            createAnimal(animal)
         }
     }
 
     // MARK: Private Methods
     @discardableResult
-    private func createAnimal(_ asset: String, yOffset: CGFloat = 0) -> BalloonView {
+    private func createAnimal(_ animal: Animal, yOffset: CGFloat = 0) -> BalloonView {
         let randomX = CGFloat.random(in: imageWidth...max(imageWidth, view.bounds.width - imageWidth))
-        let animal = BalloonView(frame: CGRect(
+        let balloon = BalloonView(frame: CGRect(
             origin: CGPoint(x: randomX.rounded(.down), y: view.bounds.height + 70 + yOffset),
             size: CGSize(width: imageWidth, height: imageWidth)
         ))
-        animal.animalAsset = asset
-        animal.balloonAsset = balloons.randomElement()
+        balloon.animal = animal
+        balloon.balloonAsset = balloons.randomElement()
 
-        animal.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(popBalloon(_:))))
-        animalBehavior.addView(animal)
-        push(animal)
+        balloon.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(popBalloon(_:))))
+        animalBehavior.addView(balloon)
+        push(balloon)
 
-        return animal
+        return balloon
     }
 
     private func releaseAnimals(from balloon: BalloonView) {
@@ -122,8 +89,8 @@ final class GameOverViewController: UIViewController, UICollisionBehaviorDelegat
         play(Assets.Sounds.Pop)
 
         let height = view.bounds.height
-        for image in images.prefix(numberOfImages) {
-            createAnimal(image, yOffset: -CGFloat.random(in: (height * 0.10)...(height * 0.75)))
+        for animal in Animal.allCases.prefix(numberOfAnimals) {
+            createAnimal(animal, yOffset: -CGFloat.random(in: (height * 0.10)...(height * 0.75)))
         }
     }
 
@@ -158,22 +125,26 @@ final class GameOverViewController: UIViewController, UICollisionBehaviorDelegat
     }
 
     @objc private func popBalloon(_ sender: UITapGestureRecognizer) {
-        guard let animal = sender.view as? BalloonView else { return }
-        animal.pop()
-        animal.isUserInteractionEnabled = false
-        animal.removeGestureRecognizer(sender)
+        guard let balloon = sender.view as? BalloonView else { return }
+        balloon.pop()
+        balloon.isUserInteractionEnabled = false
+        balloon.removeGestureRecognizer(sender)
         play(Assets.Sounds.Pop)
-        play(animal.animalAsset.flatMap { animalSounds[$0] } ?? Assets.Sounds.Whistle)
+        play(balloon.animal?.soundName ?? Assets.Sounds.Whistle)
 
-        animalBehavior.instantaneousPush(animal, vector: CGVector(dx: 0, dy: -0.75))
-        animalBehavior.addGravityBehavior(animal)
+        animalBehavior.instantaneousPush(balloon, vector: CGVector(dx: 0, dy: -0.75))
+        animalBehavior.addGravityBehavior(balloon)
 
         pops += 1
-        if pops == numberOfImages {
+        if pops == numberOfAnimals {
             view.isUserInteractionEnabled = true
             view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(playAgain(_:))))
-            balloon = createBalloon("YOU WIN!\rPLAY AGAIN?", autoPop: false)
+            self.balloon = createBalloon("YOU WIN!\rPLAY AGAIN?", autoPop: false)
         }
+    }
+
+    @IBAction func playAgainTapped(_ sender: UIButton) {
+        performSegue(withIdentifier: Segues.PlayAgain, sender: self)
     }
 
     @objc private func playAgain(_ sender: UITapGestureRecognizer) {
@@ -190,11 +161,7 @@ final class GameOverViewController: UIViewController, UICollisionBehaviorDelegat
         animalBehavior.continuousPush(animal, vector: CGVector(dx: 0, dy: speed * -0.025))
     }
 
-    /// Keeps players alive until they finish; drops ones that already have.
     private func play(_ sound: String) {
-        sounds.removeAll { !$0.isPlaying }
-        if let player = AVAudioPlayer.playSound(sound) {
-            sounds.append(player)
-        }
+        SoundPlayer.shared.play(sound)
     }
 }
