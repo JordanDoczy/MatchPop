@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		E616C7081C03DFBE00231BD9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E616C7071C03DFBE00231BD9 /* AppDelegate.swift */; };
+		E6A000021C03DFBE00231BD9 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6A000011C03DFBE00231BD9 /* SceneDelegate.swift */; };
 		E616C70D1C03DFBE00231BD9 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E616C70B1C03DFBE00231BD9 /* Main.storyboard */; };
 		E616C7121C03DFBE00231BD9 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E616C7101C03DFBE00231BD9 /* LaunchScreen.storyboard */; };
 		E616C71F1C03DFFC00231BD9 /* IntroViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E616C71A1C03DFFC00231BD9 /* IntroViewController.swift */; };
@@ -45,6 +46,7 @@
 /* Begin PBXFileReference section */
 		E616C7041C03DFBE00231BD9 /* MatchPop!.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "MatchPop!.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E616C7071C03DFBE00231BD9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		E6A000011C03DFBE00231BD9 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		E616C70C1C03DFBE00231BD9 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		E616C7111C03DFBE00231BD9 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		E616C7131C03DFBE00231BD9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -154,6 +156,7 @@
 			isa = PBXGroup;
 			children = (
 				E616C7071C03DFBE00231BD9 /* AppDelegate.swift */,
+				E6A000011C03DFBE00231BD9 /* SceneDelegate.swift */,
 				E616C72D1C03E05900231BD9 /* AnimalBehavior.swift */,
 				E616C72F1C03E05900231BD9 /* AVAudioPlayerExtension.swift */,
 			);
@@ -301,6 +304,7 @@
 				E616C7261C03E01E00231BD9 /* UserSettings.swift in Sources */,
 				E616C72A1C03E02C00231BD9 /* BalloonView.swift in Sources */,
 				E616C7081C03DFBE00231BD9 /* AppDelegate.swift in Sources */,
+				E6A000021C03DFBE00231BD9 /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -364,7 +368,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -406,7 +410,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
@@ -425,14 +429,16 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = "MatchPop!/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MARKETING_VERSION = 1.5;
 				PRODUCT_BUNDLE_IDENTIFIER = com.jordandoczy.MatchPop;
 				PRODUCT_NAME = "MatchPop!";
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				SWIFT_VERSION = 5.0;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
@@ -447,13 +453,15 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = "MatchPop!/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MARKETING_VERSION = 1.5;
 				PRODUCT_BUNDLE_IDENTIFIER = com.jordandoczy.MatchPop;
 				PRODUCT_NAME = "MatchPop!";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				SWIFT_VERSION = 5.0;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;

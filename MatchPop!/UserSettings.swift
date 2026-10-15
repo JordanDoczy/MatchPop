@@ -8,35 +8,34 @@
 
 import Foundation
 
-class UserSettings{
-    static var sharedInstance = UserSettings()
-    
-    struct Constants{
-        static let Sound = "sound"
-        static let Difficultry = "difficulty"
+final class UserSettings {
+    static let shared = UserSettings()
+
+    private enum Keys {
+        static let sound = "sound"
+        static let difficulty = "difficulty"
     }
-    
-    enum Difficulty :Int{
+
+    enum Difficulty: Int {
         case easy = 0, medium, hard
     }
-    
-    var sound:Bool{
-        get {
-            return UserDefaults.standard.object(forKey: Constants.Sound) as? Bool ?? true
-        }
-        set{
-            UserDefaults.standard.set(newValue, forKey: Constants.Sound)
-        }
+
+    private let defaults = UserDefaults.standard
+
+    private init() {
+        defaults.register(defaults: [
+            Keys.sound: true,
+            Keys.difficulty: Difficulty.medium.rawValue
+        ])
     }
 
-    var difficulty:Difficulty{
-        get {
-            return Difficulty(rawValue:((UserDefaults.standard.object(forKey: Constants.Difficultry) as? Int) ?? Difficulty.medium.rawValue)) ?? Difficulty.medium
-        }
-        set{
-            UserDefaults.standard.set(newValue.rawValue, forKey: Constants.Difficultry)
-        }
-
+    var sound: Bool {
+        get { defaults.bool(forKey: Keys.sound) }
+        set { defaults.set(newValue, forKey: Keys.sound) }
     }
 
+    var difficulty: Difficulty {
+        get { Difficulty(rawValue: defaults.integer(forKey: Keys.difficulty)) ?? .medium }
+        set { defaults.set(newValue.rawValue, forKey: Keys.difficulty) }
+    }
 }

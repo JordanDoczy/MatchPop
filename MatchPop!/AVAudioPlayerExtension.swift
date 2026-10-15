@@ -6,24 +6,19 @@
 //  Copyright © 2015 Jordan Doczy. All rights reserved.
 //
 
-import Foundation
 import AVFoundation
 
-
-extension AVAudioPlayer{
-    static func playSound(_ fileName:String, type:String="wav") ->AVAudioPlayer? {
-        var player:AVAudioPlayer? = nil
-        let audioPath = Bundle.main.path(forResource: fileName, ofType: "wav")
-        
-        do {
-            try player = AVAudioPlayer(contentsOf: URL(fileURLWithPath: audioPath!))
-            if UserSettings.sharedInstance.sound {
-                player!.play()
-            }
+extension AVAudioPlayer {
+    /// Returns the player so callers can keep it alive until playback finishes.
+    @discardableResult
+    static func playSound(_ fileName: String, type: String = "wav") -> AVAudioPlayer? {
+        guard let url = Bundle.main.url(forResource: fileName, withExtension: type),
+              let player = try? AVAudioPlayer(contentsOf: url) else {
+            return nil
         }
-        catch { }
-        
+        if UserSettings.shared.sound {
+            player.play()
+        }
         return player
     }
 }
-

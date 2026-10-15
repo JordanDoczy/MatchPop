@@ -6,10 +6,8 @@
 //  Copyright © 2015 Jordan Doczy. All rights reserved.
 //
 
-import Foundation
-
-class Assets{
-    struct Sounds{
+enum Assets {
+    enum Sounds {
         static let Click    = "click"
         static let Cat      = "cat"
         static let Cow      = "cow"
@@ -29,11 +27,11 @@ class Assets{
         static let Whistle  = "whistle"
         static let Wee      = "wee"
     }
-    
-    struct Images{
+
+    enum Images {
         static let Card = "card"
-        
-        struct Balloons{
+
+        enum Balloons {
             static let Red      = "red-balloon"
             static let Orange   = "orange-balloon"
             static let Yellow   = "yellow-balloon"
@@ -43,14 +41,14 @@ class Assets{
             static let Pop      = "pop"
         }
 
-        struct Scenery{
+        enum Scenery {
             static let Background   = "background"
             static let Cloud        = "cloud"
             static let Foreground   = "foreground"
             static let Mountains    = "mountains"
         }
-        
-        struct Animals{
+
+        enum Animals {
             static let Cat       = "cat"
             static let Cougar    = "cougar"
             static let Cow       = "cow"
@@ -75,8 +73,6 @@ class Assets{
             static let Sheep     = "sheep"
             static let Tiger     = "tiger"
             static let Zebra     = "zebra"
-            
         }
     }
 }
-

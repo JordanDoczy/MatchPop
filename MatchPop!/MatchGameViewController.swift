@@ -8,265 +8,164 @@
 
 import UIKit
 import AVFoundation
-// FIXME: comparison operators with optionals were removed from the Swift Standard Libary.
-// Consider refactoring the code to use the non-optional operators.
-fileprivate func < <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
-  switch (lhs, rhs) {
-  case let (l?, r?):
-    return l < r
-  case (nil, _?):
-    return true
-  default:
-    return false
-  }
-}
 
+final class MatchGameViewController: UIViewController, CardViewDelegate {
 
-class MatchGameViewController: UIViewController, CardViewDelegate {
-    
-    struct Constants{
-        struct Segues{
-            static let GameOver = "Game Over"
-            static let Settings = "Show Settings"
-        }
-        struct Selectors{
-            static let FlipCard:Selector = #selector(MatchGameViewController.flipCard(_:))
-            static let FlipTwoCards:Selector = #selector(MatchGameViewController.flipTwoCards(_:))
-            static let Show:Selector = #selector(CardView.show)
-        }
+    private enum Segues {
+        static let GameOver = "Game Over"
     }
-    
+
     // MARK: Private Members
-    fileprivate var audioPlayer:AVAudioPlayer?
-    fileprivate var cards = [CardView]()
-    fileprivate var cardHeight: CGFloat { return self.cardWidth }
-    fileprivate var cardsPerRow:Int {
-        switch(numberOfCards){
-        case (0...12):
-            return 4
-        case (13...30):
-            return 5
-        default:
-            return 6
+    private var audioPlayer: AVAudioPlayer?
+    private var cards = [CardView]()
+    private var cardHeight: CGFloat { cardWidth }
+    private var cardsPerRow: Int {
+        switch numberOfCards {
+        case 0...12: 4
+        case 13...30: 5
+        default: 6
         }
     }
-    fileprivate var cardWidth: CGFloat { return (view.bounds.width - (spacer * CGFloat(cardsPerRow+1))) / CGFloat(cardsPerRow) }
-    fileprivate var currentCard:CardView?
-    var difficulty:UserSettings.Difficulty?{
-        didSet{
-            reset()
-        }
+    private var cardWidth: CGFloat { (view.bounds.width - spacer * CGFloat(cardsPerRow + 1)) / CGFloat(cardsPerRow) }
+    private var lastCard: CardView?
+    var difficulty: UserSettings.Difficulty? {
+        didSet { reset() }
     }
-    fileprivate var images = [
-        Assets.Images.Animals.Cat:UIColor(red: 230/255, green: 164/255, blue: 174/255, alpha: 1),
-        Assets.Images.Animals.Cow:UIColor(red: 177/255, green: 237/255, blue: 235/255, alpha: 1),
-        Assets.Images.Animals.Deer:UIColor(red: 246/255, green: 197/255, blue: 127/255, alpha: 1),
-        Assets.Images.Animals.Dog:UIColor(red: 243/255, green: 234/255, blue: 170/255, alpha: 1),
-        Assets.Images.Animals.Donkey:UIColor(red: 190/255, green: 203/255, blue: 215/255, alpha: 1),
-        Assets.Images.Animals.Elephant:UIColor(red: 255/255, green: 255/255, blue: 255/255, alpha: 1),
-        Assets.Images.Animals.Fox:UIColor(red: 249/255, green: 247/255, blue: 223/255, alpha: 1),
-        Assets.Images.Animals.Hen:UIColor(red: 209/255, green: 135/255, blue: 132/255, alpha: 1),
-        Assets.Images.Animals.Leopard:UIColor(red: 164/255, green: 199/255, blue: 179/255, alpha: 1),
-        Assets.Images.Animals.Lion:UIColor(red: 254/255, green: 242/255, blue: 118/255, alpha: 1),
-        Assets.Images.Animals.Monkey:UIColor(red: 186/255, green: 162/255, blue: 150/255, alpha: 1),
-        Assets.Images.Animals.Orangutan:UIColor(red: 203/255, green: 203/255, blue: 203/255, alpha: 1),
-        Assets.Images.Animals.Owl:UIColor(red: 241/255, green: 179/255, blue: 131/255, alpha: 1),
-        Assets.Images.Animals.Panda:UIColor(red: 255/255, green: 179/255, blue: 190/255, alpha: 1),
-        Assets.Images.Animals.Panther:UIColor(red: 202/255, green: 233/255, blue: 201/255, alpha: 1),
-        Assets.Images.Animals.Penguin:UIColor(red: 131/255, green: 144/255, blue: 166/255, alpha: 1),
-        Assets.Images.Animals.Pig:UIColor(red: 230/255, green: 229/255, blue: 242/255, alpha: 1),
-        Assets.Images.Animals.Rabbit:UIColor(red: 155/255, green: 163/255, blue: 216/255, alpha: 1),
-        Assets.Images.Animals.Rooster:UIColor(red: 241/255, green: 179/255, blue: 131/255, alpha: 1),
-        Assets.Images.Animals.Sheep:UIColor(red: 249/255, green: 221/255, blue: 191/255, alpha: 1),
-        Assets.Images.Animals.Zebra:UIColor(red: 169/255, green: 255/255, blue: 190/255, alpha: 1)
+    private let images = [
+        Assets.Images.Animals.Cat: UIColor(red: 230/255, green: 164/255, blue: 174/255, alpha: 1),
+        Assets.Images.Animals.Cow: UIColor(red: 177/255, green: 237/255, blue: 235/255, alpha: 1),
+        Assets.Images.Animals.Deer: UIColor(red: 246/255, green: 197/255, blue: 127/255, alpha: 1),
+        Assets.Images.Animals.Dog: UIColor(red: 243/255, green: 234/255, blue: 170/255, alpha: 1),
+        Assets.Images.Animals.Donkey: UIColor(red: 190/255, green: 203/255, blue: 215/255, alpha: 1),
+        Assets.Images.Animals.Elephant: UIColor(red: 255/255, green: 255/255, blue: 255/255, alpha: 1),
+        Assets.Images.Animals.Fox: UIColor(red: 249/255, green: 247/255, blue: 223/255, alpha: 1),
+        Assets.Images.Animals.Hen: UIColor(red: 209/255, green: 135/255, blue: 132/255, alpha: 1),
+        Assets.Images.Animals.Leopard: UIColor(red: 164/255, green: 199/255, blue: 179/255, alpha: 1),
+        Assets.Images.Animals.Lion: UIColor(red: 254/255, green: 242/255, blue: 118/255, alpha: 1),
+        Assets.Images.Animals.Monkey: UIColor(red: 186/255, green: 162/255, blue: 150/255, alpha: 1),
+        Assets.Images.Animals.Orangutan: UIColor(red: 203/255, green: 203/255, blue: 203/255, alpha: 1),
+        Assets.Images.Animals.Owl: UIColor(red: 241/255, green: 179/255, blue: 131/255, alpha: 1),
+        Assets.Images.Animals.Panda: UIColor(red: 255/255, green: 179/255, blue: 190/255, alpha: 1),
+        Assets.Images.Animals.Panther: UIColor(red: 202/255, green: 233/255, blue: 201/255, alpha: 1),
+        Assets.Images.Animals.Penguin: UIColor(red: 131/255, green: 144/255, blue: 166/255, alpha: 1),
+        Assets.Images.Animals.Pig: UIColor(red: 230/255, green: 229/255, blue: 242/255, alpha: 1),
+        Assets.Images.Animals.Rabbit: UIColor(red: 155/255, green: 163/255, blue: 216/255, alpha: 1),
+        Assets.Images.Animals.Rooster: UIColor(red: 241/255, green: 179/255, blue: 131/255, alpha: 1),
+        Assets.Images.Animals.Sheep: UIColor(red: 249/255, green: 221/255, blue: 191/255, alpha: 1),
+        Assets.Images.Animals.Zebra: UIColor(red: 169/255, green: 255/255, blue: 190/255, alpha: 1)
     ]
-    fileprivate var lastCard:CardView?
-    fileprivate var numberOfCards:Int{
-        if let difficultySetting = difficulty{
-            switch (difficultySetting) {
-            case UserSettings.Difficulty.easy: return 12
-            case UserSettings.Difficulty.medium: return 30
-            case UserSettings.Difficulty.hard: return 42
-            }
+    private var numberOfCards: Int {
+        switch difficulty {
+        case .easy: 12
+        case .medium: 30
+        case .hard: 42
+        case nil: images.count * 2
         }
-        
-        return images.count*2
     }
-    fileprivate var numberOfRows:Int{ return Int((numberOfCards)/cardsPerRow) }
-    fileprivate var spacer:CGFloat = 5.0
-    fileprivate var timers = [Timer]()
-    
-    
-    // MARK: View Controller LifeCycle
+    private var numberOfRows: Int { numberOfCards / cardsPerRow }
+    private let spacer: CGFloat = 5
+    // Delayed card flips from the previous deal; cancelled on reset so they can't touch new cards.
+    private var pendingTasks = [Task<Void, Never>]()
+
+    // MARK: View Controller Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        difficulty = UserSettings.sharedInstance.difficulty
+        difficulty = UserSettings.shared.difficulty
     }
-    
+
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        
-        if difficulty != UserSettings.sharedInstance.difficulty{
-            difficulty = UserSettings.sharedInstance.difficulty
+        if difficulty != UserSettings.shared.difficulty {
+            difficulty = UserSettings.shared.difficulty
         }
-        
-        //performSegueWithIdentifier(Constants.Segues.GameOver, sender: self) // for testing
     }
 
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-    }
-    
-    
-    // MARK: Public Methods
+    // MARK: CardViewDelegate
     func cardTapped(_ card: CardView) {
-        func foundMatch(){
-            audioPlayer = AVAudioPlayer.playSound(Assets.Sounds.Match)
-            currentCard!.hide()
-            lastCard!.hide()
-            
-            view.bringSubviewToFront(currentCard!)
-            view.bringSubviewToFront(lastCard!)
-            
-            
-            cards.remove(at: cards.firstIndex(of: currentCard!)!)
-            cards.remove(at: cards.firstIndex(of: lastCard!)!)
-
-            if isGameOver() {
-                performSegue(withIdentifier: Constants.Segues.GameOver, sender: self)
-            }
-        }
-        
         audioPlayer = AVAudioPlayer.playSound(Assets.Sounds.Click)
-        
-        if lastCard == nil {
-            lastCard = card
-        }
-        else {
-            currentCard = card
-            if currentCard!.value == lastCard!.value {
-                foundMatch()
-            }
-            else{
-                addTimer(Timer.scheduledTimer(timeInterval: 1.25, target: self, selector: Constants.Selectors.FlipTwoCards, userInfo: [currentCard!, lastCard!], repeats: false))
-            }
-            currentCard = nil
-            lastCard = nil
-        }
-        
         card.visible = true
-    }
-    
-    @objc func flipCard(_ timer:Timer?){
-        if let card = timer?.userInfo as? CardView{
-            card.visible = false
-            removeTimer(timer)
-        }
-    }
-    
-    @objc func flipTwoCards(_ timer:Timer?){
-        
-        if let cards = timer?.userInfo as? [CardView]{
-            if cards.count == 2 {
-                cards[0].visible = false
-                addTimer(Timer.scheduledTimer(timeInterval: 0.25, target: self, selector: Constants.Selectors.FlipCard, userInfo: cards[1], repeats: false))
-            }
-        }
-        
-        removeTimer(timer)
-    }
-    
-    // MARK: Private Methods
-    fileprivate func addTimer(_ timer:Timer){
-        if timers.firstIndex(of: timer) < 0 {
-            timers.append(timer)
-        }
-    }
-    
-    fileprivate func animateCards(){
-        for i in 0..<cards.count{
-            addTimer(Timer.scheduledTimer(timeInterval: Double(i) * 0.015, target: cards[i], selector: Constants.Selectors.Show, userInfo: nil, repeats: false))
-        }
-    }
 
-    fileprivate func createCards(){
-        cards = []
-        
-        var cardImages = Array(Array(images.keys).shuffle()[0..<(numberOfCards/2)])
-        cardImages += cardImages
-        
-        let yOffSet = view.bounds.height/2 - (CGFloat(numberOfRows) * (cardHeight+spacer))/2
-        var count = 0
-        while cardImages.count > 0 {
-            
-            let row = Int(floor(CGFloat(count/cardsPerRow)))
-            let column = Int(count % cardsPerRow)
-            let image = cardImages.remove(at: Int(arc4random_uniform(UInt32(cardImages.count))))
-            let card = CardView(frame: CGRect(origin: CGPoint(x: CGFloat(column) * (cardWidth + spacer) + spacer, y: CGFloat(row) * (cardHeight + spacer) + CGFloat(yOffSet)), size: CGSize(width: cardWidth, height: cardHeight)), back: Assets.Images.Card, front: image, color:images[image]!)
-            card.delegate = self
-            
-            
-            view.addSubview(card)
-            cards += [card]
-            count += 1
+        guard let previous = lastCard else {
+            lastCard = card
+            return
         }
-    }
-    
-    fileprivate func isGameOver() ->Bool {
-        return cards.count == 0
-    }
-
-    fileprivate func removeAllTimers(){
-        for timer in timers{
-            removeTimer(timer)
-        }
-    }
-
-    fileprivate func removeTimer(_ timer:Timer?){
-        timer?.invalidate()
-        if let index = timers.firstIndex(of: timer!){
-            timers.remove(at: index)
-        }
-    }
-    
-    fileprivate func reset(){
         lastCard = nil
-        currentCard = nil
-        _ = view.subviews.map(){
-            if let view = $0 as? CardView{
-                view.removeFromSuperview()
+
+        if card.value == previous.value {
+            foundMatch(card, previous)
+        } else {
+            after(.seconds(1.25)) {
+                card.visible = false
+                try? await Task.sleep(for: .seconds(0.25))
+                previous.visible = false
             }
         }
-        
+    }
+
+    // MARK: Private Methods
+    private func foundMatch(_ first: CardView, _ second: CardView) {
+        audioPlayer = AVAudioPlayer.playSound(Assets.Sounds.Match)
+        for card in [first, second] {
+            card.hide()
+            view.bringSubviewToFront(card)
+        }
+        cards.removeAll { $0 === first || $0 === second }
+
+        if cards.isEmpty {
+            performSegue(withIdentifier: Segues.GameOver, sender: self)
+        }
+    }
+
+    private func after(_ delay: Duration, _ work: @escaping @MainActor () async -> Void) {
+        pendingTasks.append(Task {
+            try? await Task.sleep(for: delay)
+            guard !Task.isCancelled else { return }
+            await work()
+        })
+    }
+
+    private func animateCards() {
+        let cards = cards
+        after(.zero) {
+            for card in cards {
+                card.show()
+                try? await Task.sleep(for: .seconds(0.015))
+            }
+        }
+    }
+
+    private func createCards() {
+        let pairs = images.keys.shuffled().prefix(numberOfCards / 2)
+        let cardImages = (pairs + pairs).shuffled()
+        let yOffset = view.bounds.height / 2 - (CGFloat(numberOfRows) * (cardHeight + spacer)) / 2
+
+        cards = cardImages.enumerated().map { index, image in
+            let row = index / cardsPerRow
+            let column = index % cardsPerRow
+            let origin = CGPoint(
+                x: CGFloat(column) * (cardWidth + spacer) + spacer,
+                y: CGFloat(row) * (cardHeight + spacer) + yOffset
+            )
+            let card = CardView(
+                frame: CGRect(origin: origin, size: CGSize(width: cardWidth, height: cardHeight)),
+                back: Assets.Images.Card,
+                front: image,
+                color: images[image] ?? .clear
+            )
+            card.delegate = self
+            view.addSubview(card)
+            return card
+        }
+    }
+
+    private func reset() {
+        pendingTasks.forEach { $0.cancel() }
+        pendingTasks.removeAll()
+        lastCard = nil
+        view.subviews.lazy.compactMap { $0 as? CardView }.forEach { $0.removeFromSuperview() }
+
         createCards()
         animateCards()
         audioPlayer = AVAudioPlayer.playSound(Assets.Sounds.Start)
     }
 }
-
-
-extension Collection {
-    /// Return a copy of `self` with its elements shuffled
-    func shuffle() -> [Iterator.Element] {
-        var list = Array(self)
-        list.shuffleInPlace()
-        return list
-    }
-}
-
-extension MutableCollection where Index == Int {
-    /// Shuffle the elements of `self` in-place.
-    mutating func shuffleInPlace() {
-        // empty and single-element collections don't shuffle
-        guard count > 2 else { return }
-
-        for i in startIndex ..< endIndex - 1 {
-            let j = Int(arc4random_uniform(UInt32(endIndex - i))) + i
-            if i != j {
-                self.swapAt(i, j)
-            }
-        }
-    }
-}
-
-

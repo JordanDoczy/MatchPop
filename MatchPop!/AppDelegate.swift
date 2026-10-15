@@ -8,17 +8,13 @@
 
 import UIKit
 
-@UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate {
-
-    var window: UIWindow?
-
+@main
+final class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        
-        let attr = NSDictionary(object: UIFont(name: "ChalkboardSE-Light", size: 16.0)!, forKey: NSAttributedString.Key.font as NSCopying) as! [NSAttributedString.Key: Any]
-        UISegmentedControl.appearance().setTitleTextAttributes(attr, for: UIControl.State())
-        
+        if let font = UIFont(name: "ChalkboardSE-Light", size: 16) {
+            UISegmentedControl.appearance().setTitleTextAttributes([.font: font], for: .normal)
+        }
         return true
     }
 }
