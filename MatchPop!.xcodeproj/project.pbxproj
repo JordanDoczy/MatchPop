@@ -40,6 +40,7 @@
 		E6A000061C03DFBE00231BD9 /* Animal.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6A000051C03DFBE00231BD9 /* Animal.swift */; };
 		E6A000081C03DFBE00231BD9 /* SoundPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6A000071C03DFBE00231BD9 /* SoundPlayer.swift */; };
 		E6A0000A1C03DFBE00231BD9 /* CardLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6A000091C03DFBE00231BD9 /* CardLayout.swift */; };
+		E6A0000E1C03DFBE00231BD9 /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = E6A0000D1C03DFBE00231BD9 /* AppIcon.icon */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -89,6 +90,7 @@
 		E6A000051C03DFBE00231BD9 /* Animal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Animal.swift; sourceTree = "<group>"; };
 		E6A000071C03DFBE00231BD9 /* SoundPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundPlayer.swift; sourceTree = "<group>"; };
 		E6A000091C03DFBE00231BD9 /* CardLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardLayout.swift; sourceTree = "<group>"; };
+		E6A0000D1C03DFBE00231BD9 /* AppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AppIcon.icon; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -214,6 +216,7 @@
 			isa = PBXGroup;
 			children = (
 				E616C72E1C03E05900231BD9 /* Assets.swift */,
+				E6A0000D1C03DFBE00231BD9 /* AppIcon.icon */,
 				E616C7551C03E18800231BD9 /* Assets.xcassets */,
 				E616C7351C03E0BD00231BD9 /* Sounds */,
 			);
@@ -333,6 +336,7 @@
 				E616C70D1C03DFBE00231BD9 /* Main.storyboard in Resources */,
 				E616C7501C03E0D600231BD9 /* start.wav in Resources */,
 				E616C7561C03E18800231BD9 /* Assets.xcassets in Resources */,
+				E6A0000E1C03DFBE00231BD9 /* AppIcon.icon in Resources */,
 				E616C74D1C03E0D600231BD9 /* pop.wav in Resources */,
 				E6A000041C03DFBE00231BD9 /* PrivacyInfo.xcprivacy in Resources */,
 			);
