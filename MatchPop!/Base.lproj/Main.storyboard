@@ -10,7 +10,7 @@
         <!--Match Game-->
         <scene sceneID="He2-vj-CRV">
             <objects>
-                <viewController title="Match Game" id="X2h-07-Y96" customClass="MatchGameViewController" customModule="MatchPop_" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController title="Match Game" id="X2h-07-Y96" storyboardIdentifier="MatchGame" customClass="MatchGameViewController" customModule="MatchPop_" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="Mjx-SP-TUX"/>
                         <viewControllerLayoutGuide type="bottom" id="kZb-Ww-EXF"/>
@@ -76,7 +76,7 @@
         <!--Game Over!-->
         <scene sceneID="Pn2-XG-rKE">
             <objects>
-                <viewController title="Game Over!" id="jZG-LV-L2k" customClass="GameOverViewController" customModule="MatchPop_" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController title="Game Over!" id="jZG-LV-L2k" storyboardIdentifier="GameOver" customClass="GameOverViewController" customModule="MatchPop_" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="cMd-Op-fNv"/>
                         <viewControllerLayoutGuide type="bottom" id="ZGe-o5-hpC"/>
@@ -307,7 +307,7 @@
         <!--Navigation Controller-->
         <scene sceneID="uyI-FU-xXw">
             <objects>
-                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="06o-W5-2Vk" sceneMemberID="viewController">
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="06o-W5-2Vk" storyboardIdentifier="Settings" sceneMemberID="viewController">
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="XFM-6b-1T1">
                         <rect key="frame" x="0.0" y="44" width="414" height="44"/>

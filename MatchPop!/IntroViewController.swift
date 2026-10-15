@@ -38,9 +38,23 @@ final class IntroViewController: UIViewController {
             animateForeground()
             play(Assets.Sounds.Intro)
             loaded = true
+            #if DEBUG
+            presentScreenshotScreenIfRequested()
+            #endif
         }
         animateClouds()
     }
+
+    #if DEBUG
+    /// App Store screenshots: launch with `-screenshotScreen MatchGame` (or GameOver, Settings)
+    /// to open that screen without playing to it.
+    private func presentScreenshotScreenIfRequested() {
+        guard let screen = UserDefaults.standard.string(forKey: "screenshotScreen") else { return }
+        let destination = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: screen)
+        destination.modalPresentationStyle = .overFullScreen
+        present(destination, animated: false)
+    }
+    #endif
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == Segues.Settings {
