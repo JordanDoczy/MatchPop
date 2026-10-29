@@ -6,10 +6,8 @@
 //  Copyright © 2015 Jordan Doczy. All rights reserved.
 //
 
-import Foundation
-
-class Assets{
-    struct Sounds{
+enum Assets {
+    enum Sounds {
         static let Click    = "click"
         static let Cat      = "cat"
         static let Cow      = "cow"
@@ -23,17 +21,14 @@ class Assets{
         static let Pop      = "pop"
         static let Rooster  = "rooster"
         static let Sheep    = "sheep"
-        static let Slide    = "slide-whistle"
         static let Start    = "start"
-        static let Waiting  = "xylophone"
         static let Whistle  = "whistle"
-        static let Wee      = "wee"
     }
-    
-    struct Images{
+
+    enum Images {
         static let Card = "card"
-        
-        struct Balloons{
+
+        enum Balloons {
             static let Red      = "red-balloon"
             static let Orange   = "orange-balloon"
             static let Yellow   = "yellow-balloon"
@@ -43,40 +38,11 @@ class Assets{
             static let Pop      = "pop"
         }
 
-        struct Scenery{
+        enum Scenery {
             static let Background   = "background"
             static let Cloud        = "cloud"
             static let Foreground   = "foreground"
             static let Mountains    = "mountains"
         }
-        
-        struct Animals{
-            static let Cat       = "cat"
-            static let Cougar    = "cougar"
-            static let Cow       = "cow"
-            static let Deer      = "deer"
-            static let Dog       = "dog"
-            static let Donkey    = "donkey"
-            static let Elephant  = "elephant"
-            static let Fox       = "fox"
-            static let Hen       = "hen"
-            static let Leopard   = "leopard"
-            static let Lion      = "lion"
-            static let Lioness   = "lioness"
-            static let Monkey    = "monkey"
-            static let Orangutan = "orangutan"
-            static let Owl       = "owl"
-            static let Panda     = "panda"
-            static let Panther   = "panther"
-            static let Penguin   = "penguin"
-            static let Pig       = "pig"
-            static let Rabbit    = "rabbit"
-            static let Rooster   = "rooster"
-            static let Sheep     = "sheep"
-            static let Tiger     = "tiger"
-            static let Zebra     = "zebra"
-            
-        }
     }
 }
-

@@ -8,63 +8,66 @@
 
 import UIKit
 
-class BalloonView : UIView {
-    
-    fileprivate var _popped = false
-    var popped:Bool {
-        return _popped
-    }
-    
-    var balloon: UIImageView?
-    var balloonAsset:String?{
-        didSet{
+final class BalloonView: UIView {
+
+    private(set) var popped = false
+
+    private var balloon: UIImageView?
+    var balloonAsset: String? {
+        didSet {
             balloon?.removeFromSuperview()
-            balloon = UIImageView(image:UIImage(named: balloonAsset!))
-            balloon!.frame.size = CGSize(width: frame.size.width, height: frame.size.width * balloon!.image!.ratio)
-            animal?.center.x = balloon!.center.x
-            addSubview(balloon!)
-            sendSubviewToBack(balloon!)
+            guard let balloonAsset, let image = UIImage(named: balloonAsset) else { return }
+            let balloon = UIImageView(image: image)
+            balloon.frame.size = CGSize(width: frame.width, height: frame.width * image.ratio)
+            animalView?.center.x = balloon.center.x
+            addSubview(balloon)
+            sendSubviewToBack(balloon)
+            self.balloon = balloon
         }
     }
-    
-    var animal: UIImageView?
-    var animalAsset:String?{
-        didSet{
-            animal?.removeFromSuperview()
-            animal = UIImageView(image:UIImage(named: animalAsset!))
-            animal!.frame.size = CGSize(width: frame.size.width, height: frame.size.width * animal!.image!.ratio)
-            animal!.center.y = -animal!.frame.size.height * 0.50
-            addSubview(animal!)
+
+    private var animalView: UIImageView?
+    var animal: Animal? {
+        didSet {
+            animalView?.removeFromSuperview()
+            guard let animal, let image = UIImage(named: animal.imageName) else { return }
+            let animalView = UIImageView(image: image)
+            animalView.frame.size = CGSize(width: frame.width, height: frame.width * image.ratio)
+            animalView.center.y = -animalView.frame.height * 0.5
+            addSubview(animalView)
+            self.animalView = animalView
+            isAccessibilityElement = true
+            accessibilityTraits = .button
+            accessibilityLabel = "\(animal.rawValue.capitalized) balloon"
         }
     }
-    
-    func pop(_ complete:@escaping ()->Void={}){
-        _popped = true
-        let pop = UIImageView(image: UIImage(named: Assets.Images.Balloons.Pop))
-        pop.frame.size = CGSize(width: balloon!.frame.size.width, height: balloon!.frame.size.width * pop.image!.ratio)
+
+    func pop(_ completion: @escaping () -> Void = {}) {
+        popped = true
+        accessibilityElementsHidden = true
+        guard let balloon, let popImage = UIImage(named: Assets.Images.Balloons.Pop) else {
+            completion()
+            return
+        }
+        let pop = UIImageView(image: popImage)
+        pop.frame.size = CGSize(width: balloon.frame.width, height: balloon.frame.width * popImage.ratio)
         addSubview(pop)
-        UIView.animate(withDuration: 0.25,
-            animations: { [unowned self] in
-                self.balloon!.transform = CGAffineTransform(scaleX: 0.1, y: 0.1)
-                self.balloon!.center.y -= self.balloon!.bounds.height/4
-                self.balloon!.alpha = 0
-                self.animal?.alpha = 1
-                pop.transform = CGAffineTransform(scaleX: 2, y: 2)
-                pop.alpha = 0
-            },
-            completion: { success in
-                pop.removeFromSuperview()
-                complete()
-            }
-        )
+        UIView.animate(withDuration: 0.25) {
+            balloon.transform = CGAffineTransform(scaleX: 0.1, y: 0.1)
+            balloon.center.y -= balloon.bounds.height / 4
+            balloon.alpha = 0
+            self.animalView?.alpha = 1
+            pop.transform = CGAffineTransform(scaleX: 2, y: 2)
+            pop.alpha = 0
+        } completion: { _ in
+            pop.removeFromSuperview()
+            completion()
+        }
     }
-
 }
 
-extension UIImage{
+extension UIImage {
     var ratio: CGFloat {
-        return max(size.width/size.height, size.height/size.width)
+        max(size.width / size.height, size.height / size.width)
     }
 }
-
-

@@ -7,48 +7,43 @@
 //
 
 import UIKit
-import AVFoundation
 
-class SettingsViewController: UIViewController {
+final class SettingsViewController: UIViewController {
 
-    // MARK Members
-    fileprivate var audioPlayer:AVAudioPlayer?
+    // MARK: Members
     @IBOutlet weak var audioSwitch: UISwitch!
     @IBOutlet weak var difficultySelector: UISegmentedControl!
-    
+
     // MARK: IBActions
     @IBAction func audioToggle(_ sender: UISwitch) {
-        audioPlayer = AVAudioPlayer.playSound(Assets.Sounds.Click)
-        UserSettings.sharedInstance.sound = audioSwitch.isOn
+        UserSettings.shared.sound = audioSwitch.isOn
+        SoundPlayer.shared.play(Assets.Sounds.Click)
     }
 
     @IBAction func close(_ sender: AnyObject) {
-        
         if let presenter = presentingViewController as? MatchGameViewController {
-            presenter.difficulty = UserSettings.sharedInstance.difficulty
+            presenter.difficulty = UserSettings.shared.difficulty
         }
-        
-        self.dismiss(animated: true, completion: nil)
+        dismiss(animated: true)
     }
-    
+
     @IBAction func difficultySelection(_ sender: UISegmentedControl) {
-        audioPlayer = AVAudioPlayer.playSound(Assets.Sounds.Click)
-        
+        SoundPlayer.shared.play(Assets.Sounds.Click)
         if let difficulty = UserSettings.Difficulty(rawValue: difficultySelector.selectedSegmentIndex) {
-            UserSettings.sharedInstance.difficulty = difficulty
+            UserSettings.shared.difficulty = difficulty
         }
     }
 
     @IBAction func linkToFreepik(_ sender: UIButton) {
-        if let url = URL(string: "http://www.freepik.com/free-vector/animals-flat-vector-set_715458.htm") {
-            UIApplication.shared.open(url, options: [:], completionHandler: nil)
+        if let url = URL(string: "https://www.freepik.com/free-vector/animals-flat-vector-set_715458.htm") {
+            UIApplication.shared.open(url)
         }
     }
 
     // MARK: View Controller Lifecycle
-    override func viewDidLoad(){
+    override func viewDidLoad() {
         super.viewDidLoad()
-        audioSwitch.isOn = UserSettings.sharedInstance.sound
-        difficultySelector.selectedSegmentIndex = UserSettings.sharedInstance.difficulty.rawValue
+        audioSwitch.isOn = UserSettings.shared.sound
+        difficultySelector.selectedSegmentIndex = UserSettings.shared.difficulty.rawValue
     }
 }

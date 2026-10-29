@@ -7,34 +7,23 @@
 //
 
 import UIKit
-import AVFoundation
 
-class IntroViewController: UIViewController {
-    
-    fileprivate struct Constants{
-        struct Segues{
-            static let NewGame = "New Game"
-            static let Settings = "Show Settings"
-        }
-        struct Selectors{
-            static let PandaTapped:Selector = #selector(IntroViewController.pandaTapped(_:))
-        }
+final class IntroViewController: UIViewController {
+
+    private enum Segues {
+        static let Settings = "Show Settings"
     }
 
     // MARK: Private Members
-    fileprivate var background: UIImageView!
-    fileprivate var cloud1: UIImageView!
-    fileprivate var cloud2: UIImageView!
-    fileprivate var foreground: UIImageView!
-    fileprivate var loaded = false
-    fileprivate var mountains: UIImageView!
-    fileprivate var sounds = [AVAudioPlayer]()
+    private var foreground: UIImageView!
+    private var clouds = [UIImageView]()
+    private var loaded = false
 
     // MARK: IBOutlets
     @IBOutlet weak var settingsButton: UIButton!
     @IBOutlet weak var startButton: UIButton!
     @IBOutlet weak var titleLabel: UILabel!
-    
+
     // MARK: View Controller Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -42,187 +31,150 @@ class IntroViewController: UIViewController {
         startButton.alpha = 0
         titleLabel.alpha = 0
     }
-    
+
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         if !loaded {
             animateForeground()
-            sounds.append(AVAudioPlayer.playSound(Assets.Sounds.Intro)!)
+            play(Assets.Sounds.Intro)
             loaded = true
+            #if DEBUG
+            presentScreenshotScreenIfRequested()
+            #endif
         }
         animateClouds()
     }
-    
+
+    #if DEBUG
+    /// App Store screenshots: launch with `-screenshotScreen MatchGame` (or GameOver, Settings)
+    /// to open that screen without playing to it.
+    private func presentScreenshotScreenIfRequested() {
+        guard let screen = UserDefaults.standard.string(forKey: "screenshotScreen") else { return }
+        let destination = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: screen)
+        destination.modalPresentationStyle = .overFullScreen
+        present(destination, animated: false)
+    }
+    #endif
+
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        
-        if let identifier = segue.identifier{
-            switch(identifier){
-            
-            case Constants.Segues.Settings:
-                cloud1?.removeFromSuperview()
-                cloud2?.removeFromSuperview()
-            default: break
-            }
+        if segue.identifier == Segues.Settings {
+            removeClouds()
         }
-    }
-    
-    // MARK: Private Methods
-    fileprivate func createImageView(_ imageName:String) ->UIImageView{
-        let imageView = UIImageView(image: UIImage(named: imageName))
-        imageView.frame = CGRect(origin: CGPoint(x:0, y:view.bounds.height), size: CGSize(width: view.bounds.width, height: view.bounds.width * imageView.image!.size.height / imageView.image!.size.width))
-        return imageView
-    }
-    
-    // MARK: Handlers
-    @objc func pandaTapped(_ sender:UITapGestureRecognizer){
-        sounds.append(AVAudioPlayer.playSound(Assets.Sounds.Giggle)!)
     }
 
-    
+    // MARK: Private Methods
+    private func createImageView(_ imageName: String) -> UIImageView {
+        let imageView = UIImageView(image: UIImage(named: imageName))
+        let aspect = imageView.image.map { $0.size.height / $0.size.width } ?? 0
+        imageView.frame = CGRect(x: 0, y: view.bounds.height, width: view.bounds.width, height: view.bounds.width * aspect)
+        return imageView
+    }
+
+    private func play(_ sound: String) {
+        SoundPlayer.shared.play(sound)
+    }
+
+    private func removeClouds() {
+        clouds.forEach { $0.removeFromSuperview() }
+        clouds.removeAll()
+    }
+
+    // MARK: Handlers
+    @IBAction func unwindToIntro(_ segue: UIStoryboardSegue) {}
+
+    @objc private func pandaTapped(_ sender: UITapGestureRecognizer) {
+        play(Assets.Sounds.Giggle)
+    }
+
     // MARK: Animate Methods
-    func animateBackground(){
-    
-        background = createImageView(Assets.Images.Scenery.Background)
+    private func animateBackground() {
+        let background = createImageView(Assets.Images.Scenery.Background)
         view.addSubview(background)
         view.sendSubviewToBack(background)
-        
-        
-        UIView.animate(withDuration: 0.3, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 10.0, options: UIView.AnimationOptions.curveEaseOut,
-            animations: { [unowned self] in
-                self.background.center.y -= self.background.bounds.size.height
-            },
-            completion: { [unowned self] finished in
-                self.animateMoutains(self.background)
-            }
-        )
-    }
-    
-    func animateClouds(){
-        
-        func cloud1Animation(){
-            cloud1?.removeFromSuperview()
-            cloud1 = UIImageView(image: UIImage(named:Assets.Images.Scenery.Cloud))
-            
-            let imageWidth:CGFloat = 120
-            let imageHeight = imageWidth * cloud1.image!.size.height / cloud1.image!.size.width
-            
-            cloud1.frame = CGRect(origin: CGPoint(x:view.bounds.width, y: 0+imageHeight), size: CGSize(width: imageWidth, height: imageHeight))
-            view.addSubview(cloud1)
-            
-            UIView.animate(withDuration: 20, delay: 0.5, options: [UIView.AnimationOptions.curveLinear, UIView.AnimationOptions.repeat],
-                animations: { [unowned self] in
-                    self.cloud1.center.x = 0 - self.cloud1.bounds.size.width - 50
-                },
-                completion: { [unowned self] finished in
-                    self.cloud1.center.x = self.view.bounds.width
-                    
-                }
-            )
+
+        UIView.animate(withDuration: 0.3, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 10, options: .curveEaseOut) {
+            background.center.y -= background.bounds.height
+        } completion: { _ in
+            self.animateMountains(above: background)
         }
-        
-        func cloud2Animation(){
-            
-            cloud2?.removeFromSuperview()
-            cloud2 = UIImageView(image: UIImage(named:Assets.Images.Scenery.Cloud))
-            
-            let imageWidth:CGFloat = 60
-            let imageHeight = imageWidth * cloud2.image!.size.height / cloud1.image!.size.width
-            
-            cloud2.frame = CGRect(origin: CGPoint(x:0-imageWidth, y: 0+imageHeight+80), size: CGSize(width: imageWidth, height: imageHeight))
-            view.addSubview(cloud2)
-            
-            UIView.animate(withDuration: 15, delay: 0.5, options: [UIView.AnimationOptions.curveLinear, UIView.AnimationOptions.repeat],
-                animations: { [unowned self] in
-                    self.cloud2.center.x = self.view.bounds.width + 50
-                },
-                completion: { [unowned self] finished in
-                    self.cloud2.center.x = 0-imageWidth
-                    
-                }
-            )
-        }
-        
-        cloud1Animation()
-        cloud2Animation()
     }
-    
-    func animateForeground(){
+
+    private func animateClouds() {
+        removeClouds()
+        guard !UIAccessibility.isReduceMotionEnabled else { return }
+        animateCloud(width: 120, y: 1, fromX: view.bounds.width, toX: -120 - 50, duration: 20)
+        animateCloud(width: 60, y: 1, yPadding: 80, fromX: -60, toX: view.bounds.width + 50, duration: 15)
+    }
+
+    /// `y` is a multiple of the cloud's own height, matching the original layout.
+    private func animateCloud(width: CGFloat, y: CGFloat, yPadding: CGFloat = 0, fromX: CGFloat, toX: CGFloat, duration: TimeInterval) {
+        guard let image = UIImage(named: Assets.Images.Scenery.Cloud) else { return }
+        let cloud = UIImageView(image: image)
+        let height = width * image.size.height / image.size.width
+        cloud.frame = CGRect(x: fromX, y: height * y + yPadding, width: width, height: height)
+        view.addSubview(cloud)
+        clouds.append(cloud)
+
+        UIView.animate(withDuration: duration, delay: 0.5, options: [.curveLinear, .repeat]) {
+            cloud.center.x = toX
+        }
+    }
+
+    private func animateForeground() {
         foreground = createImageView(Assets.Images.Scenery.Foreground)
         view.addSubview(foreground)
         view.sendSubviewToBack(foreground)
-        
-        
-        UIView.animate(withDuration: 0.4, delay: 0, options: UIView.AnimationOptions(),
-            animations: { [unowned self] in
-                self.foreground.center.y -= self.foreground.bounds.size.height
-            },
-            completion: { [unowned self] finished in
-                self.animateBackground()
-                
-            }
-        )
+
+        UIView.animate(withDuration: 0.4) {
+            self.foreground.center.y -= self.foreground.bounds.height
+        } completion: { _ in
+            self.animateBackground()
+        }
     }
 
-    
-    func animateMoutains(_ uiView:UIView){
-        
-        mountains = UIImageView(image: UIImage(named: Assets.Images.Scenery.Mountains))
-        let imageWidth = uiView.bounds.width/2
-        let imageHeight = uiView.bounds.width/2 * mountains.image!.size.height / mountains.image!.size.width
-        
-        mountains.frame = CGRect(origin: CGPoint(x:view.bounds.width - imageWidth, y:uiView.center.y - imageHeight ), size: CGSize(width: imageWidth, height: imageHeight))
-        
+    private func animateMountains(above background: UIView) {
+        let mountains = UIImageView(image: UIImage(named: Assets.Images.Scenery.Mountains))
+        let imageWidth = background.bounds.width / 2
+        let aspect = mountains.image.map { $0.size.height / $0.size.width } ?? 0
+        let imageHeight = imageWidth * aspect
+
+        mountains.frame = CGRect(x: view.bounds.width - imageWidth, y: background.center.y - imageHeight, width: imageWidth, height: imageHeight)
         view.addSubview(mountains)
         view.sendSubviewToBack(mountains)
-        
-        
-        UIView.animate(withDuration: 0.3, delay: 0.05, usingSpringWithDamping: 0.5, initialSpringVelocity: 10.0, options: UIView.AnimationOptions.curveLinear,
-            animations: { [unowned self] in
-                self.mountains.center.y -= imageHeight/2
-            },
-            completion: { [unowned self] finished in
-                self.animatePanda()
-                self.animateUI()
-            }
-        )
+
+        UIView.animate(withDuration: 0.3, delay: 0.05, usingSpringWithDamping: 0.5, initialSpringVelocity: 10, options: .curveLinear) {
+            mountains.center.y -= imageHeight / 2
+        } completion: { _ in
+            self.animatePanda()
+            self.animateUI()
+        }
     }
 
-    
-    func animatePanda(){
-        let imageView = UIImageView(image: UIImage(named: Assets.Images.Animals.Panda))
-        let imageWidth:CGFloat = 50
-        let imageHeight = imageWidth * imageView.image!.size.height / imageView.image!.size.width
-        
-        imageView.frame = CGRect(origin: CGPoint(x:20, y: view.bounds.height), size: CGSize(width: imageWidth, height: imageHeight))
+    private func animatePanda() {
+        let imageView = UIImageView(image: UIImage(named: Animal.panda.imageName))
+        let imageWidth: CGFloat = 50
+        let aspect = imageView.image.map { $0.size.height / $0.size.width } ?? 0
+        let imageHeight = imageWidth * aspect
+
+        imageView.frame = CGRect(x: 20, y: view.bounds.height, width: imageWidth, height: imageHeight)
         view.addSubview(imageView)
-        
-        let tapGesture = UITapGestureRecognizer(target:self, action:Constants.Selectors.PandaTapped);
+
         imageView.isUserInteractionEnabled = true
-        imageView.addGestureRecognizer(tapGesture)
-        
-        
-        UIView.animate(withDuration: 0.5, delay: 0.25, usingSpringWithDamping: 0.95, initialSpringVelocity: 20, options: UIView.AnimationOptions.curveLinear,
-            animations: { [unowned self] in
-                imageView.center.y = self.foreground.center.y - imageHeight + 10
-            },
-            completion: nil
-        )
-    }
-    
-    func animateUI(){
-        
-        UIView.animate(withDuration: 0.4, delay: 0, options: UIView.AnimationOptions(),
-            animations: { [unowned self] in
-                self.startButton.alpha = 1
-                self.titleLabel.alpha = 1
-                self.settingsButton.alpha = 1
-            },
-            completion: nil
-        )
+        imageView.isAccessibilityElement = true
+        imageView.accessibilityTraits = .button
+        imageView.accessibilityLabel = "Panda"
+        imageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(pandaTapped(_:))))
+
+        UIView.animate(withDuration: 0.5, delay: 0.25, usingSpringWithDamping: 0.95, initialSpringVelocity: 20, options: .curveLinear) {
+            imageView.center.y = self.foreground.center.y - imageHeight + 10
+        }
     }
 
-    
-    
-    
-    
+    private func animateUI() {
+        UIView.animate(withDuration: 0.4) {
+            self.startButton.alpha = 1
+            self.titleLabel.alpha = 1
+            self.settingsButton.alpha = 1
+        }
+    }
 }
