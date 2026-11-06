@@ -595,7 +595,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.0.1;
+				MARKETING_VERSION = 2.0.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.jordandoczy.MatchPop;
 				PRODUCT_NAME = "MatchPop!";
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -619,7 +619,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.0.1;
+				MARKETING_VERSION = 2.0.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.jordandoczy.MatchPop;
 				PRODUCT_NAME = "MatchPop!";
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
